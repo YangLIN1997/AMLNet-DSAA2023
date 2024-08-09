@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -P RDS-FEI-ForecastingSolar-RW
+#PBS -l select=1:ncpus=12:mem=16gb:ngpus=1
+#PBS -l walltime=90:00:00
+#PBS -m abe
+#PBS -M ylin4015@uni.sydney.edu.au
+
+module load python/3.8.2 cuda/10.2.89 magma/2.5.3 gcc/7.4.0
+source ~/pytorch/bin/activate 
+
+cd "$PBS_O_WORKDIR"
+python preprocess_traffic.py --L=7 --H=1
+python BO_large.py --dataset='traffic' --model-name='param_search_traffic' > experiments/param_search_traffic/BO_results_traffic.out
+python preprocess_traffic.py --L=7 --H=7
+python BO_large.py --dataset='traffic' --model-name='param_search_traffic_h7' > experiments/param_search_traffic_h7/BO_results_traffic_h7.out
+#python preprocess_traffic.py --L=7 --H=1
+#python train.py --dataset='traffic' --model-name='base_model_traffic' --seed=1 > experiments/base_model_traffic/results_traffic.out
+#python preprocess_traffic.py --L=7 --H=3
+#python train.py --dataset='traffic' --model-name='base_model_traffic_h3' --seed=1 > experiments/base_model_traffic_h3/results_traffic_h3.out
+#python preprocess_traffic.py --L=7 --H=7
+#python train.py --dataset='traffic' --model-name='base_model_traffic_h7' --seed=1 > experiments/base_model_traffic_h7/results_traffic_h7.out
